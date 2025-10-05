@@ -48,17 +48,18 @@ if (command) {
       status: "todo",
     };
     tasks.push(newTask);
-    console.log(tasks);
     writeToFile(tasks);
+    console.log(
+      `Task [${newTask.id}] "${description}" has been added to TODO list.`
+    );
   } else if (command === "update") {
     const id = parseInt(argv[1]);
     const description = argv[2];
-
-    console.log(isfileEmpty());
-    if (!isfileEmpty()) {
+    if (isfileEmpty()) {
       console.log("File is Empty\nNo Task in tasks.json to update");
       return;
     }
+
     const allIds = tasks.map((t) => {
       return t.id;
     });
@@ -90,8 +91,42 @@ if (command) {
     //Writing updated tasks to the tasks.json file
     writeToFile(tasks);
 
-    console.log(`Task ${id} has been updated to: ${description}`);
+    console.log(`Task [${id}] has been updated to: ${description}`);
+  } else if (command === "delete") {
+    const id = parseInt(argv[1]);
+
+    if (!id) {
+      console.log("Please enter an id to delete");
+      return;
+    }
+
+    if (isfileEmpty()) {
+      console.log("File is Empty\nNo Task in tasks.json to delete");
+      return;
+    }
+
+    const task = tasks.find((t) => {
+      return t.id === id;
+    });
+
+    if (!task) {
+      console.log("No task found having Id:", id);
+      console.log("Please try again.");
+      return;
+    }
+
+    const newtasks = tasks.filter((t) => {
+      return t.id !== id;
+    });
+
+    writeToFile(newtasks);
+    console.log(`Task ${id} has been deleted from task.json.`);
   } else if (command === "list") {
+    tasks.forEach((task) => {
+      console.log(
+        `Task [${task.id}] , Description: ${task.description}, Status: ${task.status}`
+      );
+    });
   }
 } else {
   console.log("Please write a command");
