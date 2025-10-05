@@ -122,11 +122,55 @@ if (command) {
     writeToFile(newtasks);
     console.log(`Task ${id} has been deleted from task.json.`);
   } else if (command === "list") {
-    tasks.forEach((task) => {
+    const status = argv[1];
+
+    if (!status) {
+      tasks.forEach((task) => {
+        console.log(
+          `Task [${task.id}] , Description: ${task.description}, Status: ${task.status}`
+        );
+      });
+      return;
+    }
+
+    if (status === "todo") {
+      const todoTasks = tasks
+        .filter((t) => {
+          return t.status === status;
+        })
+        .forEach((task) => {
+          console.log(
+            `Task [${task.id}] , Description: ${task.description}, Status: ${task.status}`
+          );
+        });
+      return;
+    } else if (status === "in_progress") {
+      const inProgressTasks = tasks
+        .filter((t) => {
+          return t.status === status;
+        })
+        .forEach((task) => {
+          console.log(
+            `Task [${task.id}] , Description: ${task.description}, Status: ${task.status}`
+          );
+        });
+      return;
+    } else if (status === "done") {
+      const doneTasks = tasks
+        .filter((t) => {
+          return t.status === status;
+        })
+        .forEach((task) => {
+          console.log(
+            `Task [${task.id}] , Description: ${task.description}, Status: ${task.status}`
+          );
+        });
+      return;
+    } else {
       console.log(
-        `Task [${task.id}] , Description: ${task.description}, Status: ${task.status}`
+        "\nInvalid argument for [task.status]\nEnter from [todo, in_progress, done]\n"
       );
-    });
+    }
   }
 } else {
   console.log("Please write a command");
