@@ -124,6 +124,12 @@ if (command) {
   } else if (command === "list") {
     const status = argv[1];
 
+    if (isfileEmpty()) {
+      console.log("File is Empty\nNo Task in tasks.json to list");
+      return;
+    }
+
+    //For listing all Tasks
     if (!status) {
       tasks.forEach((task) => {
         console.log(
@@ -133,44 +139,68 @@ if (command) {
       return;
     }
 
-    if (status === "todo") {
-      const todoTasks = tasks
-        .filter((t) => {
-          return t.status === status;
-        })
-        .forEach((task) => {
-          console.log(
-            `Task [${task.id}] , Description: ${task.description}, Status: ${task.status}`
-          );
-        });
-      return;
-    } else if (status === "in_progress") {
-      const inProgressTasks = tasks
-        .filter((t) => {
-          return t.status === status;
-        })
-        .forEach((task) => {
-          console.log(
-            `Task [${task.id}] , Description: ${task.description}, Status: ${task.status}`
-          );
-        });
-      return;
-    } else if (status === "done") {
-      const doneTasks = tasks
-        .filter((t) => {
-          return t.status === status;
-        })
-        .forEach((task) => {
-          console.log(
-            `Task [${task.id}] , Description: ${task.description}, Status: ${task.status}`
-          );
-        });
-      return;
-    } else {
-      console.log(
-        "\nInvalid argument for [task.status]\nEnter from [todo, in_progress, done]\n"
-      );
+    //For Todo status tasks
+    if (status) {
+      const statusTasks = tasks.filter((t) => {
+        return t.status.toLowerCase() === status.toLowerCase();
+      });
+
+      if (statusTasks.length === 0) {
+        console.log(`Task having status [${status}] doesn't exist.`);
+        return;
+      }
+
+      statusTasks.forEach((task) => {
+        console.log(
+          `Task [${task.id}] , Description: ${task.description}, Status: ${task.status}`
+        );
+      });
     }
+  } else if (
+    command === "mark-in-progress" ||
+    command === "mark-todo" ||
+    command === "mark-done"
+  ) {
+    const id = parseInt(argv[1]);
+
+    if (!id) {
+      console.log("Please enter an id.");
+      return;
+    }
+
+    const allIds = tasks.map((t) => {
+      return t.id;
+    });
+
+    if (!allIds.includes(id)) {
+      console.log(`Invalid Id: ${id}\nPlease select among these: ${allIds}`);
+      return;
+    }
+
+    if (isfileEmpty()) {
+      console.log("File is Empty\nNo Task in tasks.json to to mark");
+      return;
+    }
+
+    const statusChangeTask = tasks.find((t) => {
+      return t.id === id;
+    });
+
+    if (command === "mark-in-progress") {
+      statusChangeTask.status = "in_progress";
+    }
+    if (command === "mark-done") {
+      statusChangeTask.status = "done";
+    }
+    if (command === "mark-todo") {
+      statusChangeTask.status = "todo";
+    }
+
+    const index = tasks.indexOf(statusChangeTask);
+    tasks[index] = statusChangeTask;
+
+    writeToFile(tasks);
+    console.log(`Task [${id}]: status has been changed.`);
   }
 } else {
   console.log("Please write a command");
